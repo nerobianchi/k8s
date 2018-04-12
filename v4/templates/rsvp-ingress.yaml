@@ -1,0 +1,15 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  name: rsvp-ingress
+spec:
+  rules:
+  - host: test.akomljen.com
+    http:
+      paths:
+      - backend:
+          serviceName: rsvp
+          servicePort: 80
+        path: /

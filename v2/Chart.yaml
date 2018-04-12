@@ -1,0 +1,7 @@
+apiVersion: v1
+name: "erdem chart sample"
+description: "A helm chart"
+version: 0.1.0
+maintainers:
+  - name: erdem ozdemir
+    twitter: nerobianchi

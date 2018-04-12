@@ -1,0 +1,7 @@
+apiVersion: v1
+name: "LFS158"
+description: "LFS158 helm chart"
+version: 0.1.0
+maintainers:
+  - name: erdem ozdemir
+    twitter: nerobianchi
