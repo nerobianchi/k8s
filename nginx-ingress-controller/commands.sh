@@ -45,6 +45,8 @@ kubectl delete deployment my-nginx
 
 
 -------------nginx---------
+##########solution 1##########
+####################################################################################################
 git clone https://github.com/nginxinc/kubernetes-ingress.git
 cd kubernetes-ingress
 
@@ -54,18 +56,8 @@ kubectl apply -f common/default-server-secret.yaml
 kubectl apply -f common/nginx-config.yaml
 kubectl apply -f rbac/rbac.yaml
 kubectl apply -f daemon-set/nginx-ingress.yaml
-kubectl apply -f service/nodeport.yaml #nodePort should be added
+kubectl apply -f service/nodeport.yaml #nodePort should be added.see below
 watch kubectl get pods --namespace=nginx-ingress
-
-
-k get ns
-k get ServiceAccount -n nginx-ingress
-k get Secret -n nginx-ingress
-k get DaemonSet -n nginx-ingress
-k get ClusterRole -n nginx-ingress
-k get ClusterRoleBinding -n nginx-ingress
-k get ConfigMap -n nginx-ingress
-k get Service -n nginx-ingress
 
 cd ../examples/complete-example
 
@@ -74,14 +66,40 @@ kubectl apply -f cafe.yaml
 kubectl apply -f cafe-secret.yaml
 kubectl apply -f cafe-ingress.yaml
 curl --resolve cafe.example.com:443:$IC_IP https://cafe.example.com/coffee --insecure
-
-
+####################################################################################################
+##########solution 2##########
 #directly from github
+####################################################################################################
 kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/install/common/ns-and-sa.yaml
 kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/install/common/default-server-secret.yaml
 kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/install/common/nginx-config.yaml
 kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/install/rbac/rbac.yaml
 kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/install/daemon-set/nginx-ingress.yaml
+kubectl apply -f https://raw.githubusercontent.com/nginxinc/kubernetes-ingress/master/install/service/nodeport.yaml #nodePort should be added
+# or 
+echo <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ingress
+  namespace: nginx-ingress
+spec:
+  type: NodePort 
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+    nodePort:30080
+  - port: 443
+    targetPort: 443
+    protocol: TCP
+    name: https
+    nodePort:30443
+  selector:
+    app: nginx-ingress
+EOF
+
 watch kubectl get pods --namespace=nginx-ingress
 
 IC_IP=192.168.58.228
@@ -116,6 +134,16 @@ spec:
           serviceName: coffee-svc
           servicePort: 80
 EOF
+####################################################################################################
+k get ns
+k get ServiceAccount -n nginx-ingress
+k get Secret -n nginx-ingress
+k get DaemonSet -n nginx-ingress
+k get ClusterRole -n nginx-ingress
+k get ClusterRoleBinding -n nginx-ingress
+k get ConfigMap -n nginx-ingress
+k get Service -n nginx-ingress
+####################################################################################################
 
 curl --resolve cafe.example.com:80:$IC_IP http://cafe.example.com/coffee
 curl http://cafe.example.com/coffee
@@ -124,6 +152,7 @@ curl http://cafe.example.com/coffee
 
 curl --resolve cafe.example.com:80:$IC_IP http://cafe.example.com/coffee
 
+curl http://cafe.example.com:30080/coffee
 
 
 #clean up
